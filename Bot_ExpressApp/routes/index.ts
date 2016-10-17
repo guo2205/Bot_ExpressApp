@@ -1,10 +1,18 @@
 ﻿/*
  * GET home page.
  */
+///<reference path="../Data.ts" />
 import express = require('express');
+import * as Data from "../Data";
 
 export function index(req: express.Request, res: express.Response) {
+    /*
     res.render('index', { title: 'Express', year: new Date().getFullYear() });
+    */
+    Data.Data.post(req, res);
+
+    
+    
 };
 
 export function about(req: express.Request, res: express.Response) {

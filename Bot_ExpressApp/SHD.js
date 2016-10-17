@@ -13,8 +13,8 @@ var Bot = (function () {
             appPassword: process.env.MICROSOFT_APP_PASSWORD
         });
         this.DialogsBot = new builder.UniversalBot(this.connector);
-        this.BindDialogs();
-        //this.BindLUIS();
+        //this.BindDialogs();
+        this.BindLUIS();
     }
     //=========================================================
     // BindDialogs  Setup
@@ -41,7 +41,7 @@ var Bot = (function () {
             builder.Prompts.text(session, number.entity);
         }
         else {
-            next();
+            builder.Prompts.text(session, "ok");
         }
     };
     Bot.prototype.QueryWeatherAction = function (session, results) {

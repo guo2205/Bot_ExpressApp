@@ -5,8 +5,8 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <Name>Bot_ExpressApp</Name>
     <RootNamespace>Bot_ExpressApp</RootNamespace>
-    <Environment>MICROSOFT_APP_ID=b2317a11-6d3c-4882-84bf-2b60c7578717
-MICROSOFT_APP_PASSWORD=177134f2b924409697183f32d513055a</Environment>
+    <Environment>MICROSOFT_APP_PASSWORD=gUMECLrciPNbRbTcVDP8UMv
+MICROSOFT_APP_ID=11f5e522-a973-4113-bef6-090da3c8425a</Environment>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -36,6 +36,7 @@ MICROSOFT_APP_PASSWORD=177134f2b924409697183f32d513055a</Environment>
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
+    <TypeScriptCompile Include="Data.ts" />
     <TypeScriptCompile Include="DBH\RedisHelper.ts" />
     <TypeScriptCompile Include="routes\index.ts" />
     <TypeScriptCompile Include="Scripts\typings\express\express.d.ts" />

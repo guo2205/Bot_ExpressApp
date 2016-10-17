@@ -1,6 +1,10 @@
 "use strict";
+var Data = require("../Data");
 function index(req, res) {
+    /*
     res.render('index', { title: 'Express', year: new Date().getFullYear() });
+    */
+    Data.Data.post(req, res);
 }
 exports.index = index;
 ;
