@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "redis": "registry:npm/redis#2.6.0+20160901110043"
+  },
+  "globalDependencies": {
+    "consolidate": "registry:dt/consolidate#0.0.0+20160811111312",
+    "ejs": "registry:dt/ejs#0.0.0+20161003130526",
+    "promise": "registry:dt/promise#7.1.1+20160602154553",
+    "redis": "registry:dt/redis#0.12.1+20160818110030"
+  }
+}
