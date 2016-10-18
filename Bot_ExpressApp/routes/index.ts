@@ -6,13 +6,16 @@ import express = require('express');
 import * as Data from "../Data";
 
 export function index(req: express.Request, res: express.Response) {
-    /*
-    res.render('index', { title: 'Express', year: new Date().getFullYear() });
-    */
-    Data.Data.post(req, res);
+    var conversationRes: string = null;
+    Data.Data.httpRequest(Data.WebChatConfig.host, Data.WebChatConfig.path, Data.WebChatConfig.port, Data.WebChatConfig.method, Data.WebChatConfig.postheaders, function (message) {
+        var json = eval(message);
+        var conversationId: string = json.conversationId;
+        var token: string = json.token;
+        Data.Data.httpRequest(Data.WebChatConfig.host, Data.WebChatConfig.path + "/" + conversationId + "/messages", Data.WebChatConfig.port, Data.WebChatConfig.method, Data.WebChatConfig.postheaders, function (message) {
+            res.send(message);
+        });
 
-    
-    
+    });
 };
 
 export function about(req: express.Request, res: express.Response) {

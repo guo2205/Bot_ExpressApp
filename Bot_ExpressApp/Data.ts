@@ -1,33 +1,38 @@
 ﻿import https = require('https');
 export class Data {
-    static post(req, res): {} {
-        //json = JSON.stringify(json);
-        var message = {};
-        var postheaders =
-        {
-            'Authorization': 'aUB1CCZl3oo.cwA.0_s.kbCafvoqzdCxk9gzgzkz8LV07_rVV9p948dUtW18c2w'
-            //'Content-Type': 'application/json; charset=UTF-8',
-            //'Content-Length': Buffer.byteLength(json, 'utf8')
-        };
+    static httpRequest(host: string, path: string, port: number, method: string, postheaders: {}, fun: Function) {
+        var flg: boolean = false;
+        var num: number = 0;
         var option =
         {
-            host: 'directline.botframework.com',
-            port: 80,
-            path: '/api/conversations',
-            method: 'POST',
-        };
+            host: host,
+            port: port,
+            path: path,
+            method: method,
+            headers: postheaders
+            };
         var reqPost = https.request(option, function (resPost) {
             resPost.setEncoding('utf8');
-            resPost.on('data', function (d) {
-                console.log(d);    
-            });
+            resPost.on('data', fun);
         });
         //reqPost.write(null);
         reqPost.end();
         reqPost.on('error', function (e) {
             console.error(e);
         });
-        return message;
-
+            
     }
+}
+export class WebChatConfig
+{
+    static host: string = 'directline.botframework.com';
+    static port: number = 443;
+    static path: string = '/api/conversations';
+    static method: string = 'POST';
+    static postheaders =
+    {
+        'Authorization': 'BotConnector PtygZnH8Xvc.cwA.LRA.3O2kok04NHqnTAdUD1k3tEVvLEhphEt6WbDGQ5cWCj0',
+        //'Content-Type': 'application/json; charset=UTF-8'
+        //'Content-Length': Buffer.byteLength(json, 'utf8')
+    };
 }

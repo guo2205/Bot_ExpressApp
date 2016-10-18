@@ -1,10 +1,15 @@
 "use strict";
 var Data = require("../Data");
 function index(req, res) {
-    /*
-    res.render('index', { title: 'Express', year: new Date().getFullYear() });
-    */
-    Data.Data.post(req, res);
+    var conversationRes = null;
+    Data.Data.httpRequest(Data.WebChatConfig.host, Data.WebChatConfig.path, Data.WebChatConfig.port, Data.WebChatConfig.method, Data.WebChatConfig.postheaders, function (message) {
+        var json = eval(message);
+        var conversationId = json.conversationId;
+        var token = json.token;
+        Data.Data.httpRequest(Data.WebChatConfig.host, Data.WebChatConfig.path + "/" + conversationId + "/messages", Data.WebChatConfig.port, Data.WebChatConfig.method, Data.WebChatConfig.postheaders, function (message) {
+            res.send(message);
+        });
+    });
 }
 exports.index = index;
 ;
