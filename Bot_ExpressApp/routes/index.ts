@@ -7,11 +7,12 @@ import * as Data from "../Data";
 
 export function index(req: express.Request, res: express.Response) {
     var conversationRes: string = null;
-    Data.Data.httpRequest(Data.WebChatConfig.host, Data.WebChatConfig.path, Data.WebChatConfig.port, Data.WebChatConfig.method, Data.WebChatConfig.postheaders, function (message) {
-        var json = eval(message);
+    Data.Data.httpRequest(Data.WebChatConfig.host, Data.WebChatConfig.path, Data.WebChatConfig.port, Data.WebChatConfig.method, Data.WebChatConfig.postheaders, null, function (message) {
+        var json = JSON.parse(message);
         var conversationId: string = json.conversationId;
         var token: string = json.token;
-        Data.Data.httpRequest(Data.WebChatConfig.host, Data.WebChatConfig.path + "/" + conversationId + "/messages", Data.WebChatConfig.port, Data.WebChatConfig.method, Data.WebChatConfig.postheaders, function (message) {
+        var messagePath = Data.WebChatConfig.path + "/" + conversationId + "/messages";
+        Data.Data.httpRequest(Data.WebChatConfig.host, messagePath, Data.WebChatConfig.port, "GET", Data.WebChatConfig.postheaders, null, function (message) {
             res.send(message);
         });
 
@@ -29,3 +30,16 @@ export function contact(req: express.Request, res: express.Response) {
 export function bot(req: express.Request, res: express.Response) {
     res.render('bot.html');
 };
+
+/*
+var bady = {
+            "messages": [
+                {
+                    "conversation": conversationId,
+                    "id": conversationId + "0000",
+                    "text": "hello",
+                    "from":
+                }
+            ]
+        }
+*/

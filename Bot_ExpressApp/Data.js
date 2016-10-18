@@ -3,7 +3,7 @@ var https = require('https');
 var Data = (function () {
     function Data() {
     }
-    Data.httpRequest = function (host, path, port, method, postheaders, fun) {
+    Data.httpRequest = function (host, path, port, method, postheaders, bady, fun) {
         var flg = false;
         var num = 0;
         var option = {
@@ -17,7 +17,9 @@ var Data = (function () {
             resPost.setEncoding('utf8');
             resPost.on('data', fun);
         });
-        //reqPost.write(null);
+        if (bady != null) {
+            reqPost.write(bady);
+        }
         reqPost.end();
         reqPost.on('error', function (e) {
             console.error(e);

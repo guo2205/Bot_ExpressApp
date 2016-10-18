@@ -2,11 +2,12 @@
 var Data = require("../Data");
 function index(req, res) {
     var conversationRes = null;
-    Data.Data.httpRequest(Data.WebChatConfig.host, Data.WebChatConfig.path, Data.WebChatConfig.port, Data.WebChatConfig.method, Data.WebChatConfig.postheaders, function (message) {
-        var json = eval(message);
+    Data.Data.httpRequest(Data.WebChatConfig.host, Data.WebChatConfig.path, Data.WebChatConfig.port, Data.WebChatConfig.method, Data.WebChatConfig.postheaders, null, function (message) {
+        var json = JSON.parse(message);
         var conversationId = json.conversationId;
         var token = json.token;
-        Data.Data.httpRequest(Data.WebChatConfig.host, Data.WebChatConfig.path + "/" + conversationId + "/messages", Data.WebChatConfig.port, Data.WebChatConfig.method, Data.WebChatConfig.postheaders, function (message) {
+        var messagePath = Data.WebChatConfig.path + "/" + conversationId + "/messages";
+        Data.Data.httpRequest(Data.WebChatConfig.host, messagePath, Data.WebChatConfig.port, "GET", Data.WebChatConfig.postheaders, null, function (message) {
             res.send(message);
         });
     });
@@ -28,4 +29,16 @@ function bot(req, res) {
 }
 exports.bot = bot;
 ;
+/*
+var bady = {
+            "messages": [
+                {
+                    "conversation": conversationId,
+                    "id": conversationId + "0000",
+                    "text": "hello",
+                    "from":
+                }
+            ]
+        }
+*/
 //# sourceMappingURL=index.js.map
