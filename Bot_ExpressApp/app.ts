@@ -1,13 +1,14 @@
 ﻿///<reference path="SHD.ts" />
+
 import express = require('express');
 import routes = require('./routes/index');
 import http = require('http');
 import ejs = require('ejs');
 import path = require('path');
 import * as SHD from "./SHD";
+import AIAgant = require('./AI/AIAgant');
 var app = express();
 var bot = new SHD.Bot();
-
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -31,12 +32,26 @@ if ('development' == app.get('env')) {
     app.use(express.errorHandler());
 }
 
+//=========================================================
+// GET Bind
+//=========================================================
 app.get('/', routes.index);
 app.get('/about', routes.about);
 app.get('/contact', routes.contact);
 app.get('/bot', routes.bot);
 app.get('/home', (req, res) => { var x = req.query.qq; res.send("qq" + x); });
+app.get('/api/messages', (req, res) => { res.send("GET api/messages") });
+app.get('/api/sendtextmessage', SendTextMessage);
+
+//=========================================================
+// Post Bind
+//=========================================================
+
 app.post('/api/messages', bot.connector.listen());
+
+//=========================================================
+// Start Server
+//=========================================================
 
 http.createServer(app).listen(app.get('port'), function () {
     console.log('Express server listening on port ' + app.get('port'));
@@ -53,3 +68,41 @@ var options = {
 https.createServer(options, app).listen(4444, function () {
     console.log('Https server listening on port ' + 4444);
 });
+
+//=========================================================
+// static function
+//=========================================================
+
+function CheckPa(...args: string[]): boolean
+{
+    for (var i: number = 0; i < args.length; i++)
+    {
+        if (typeof args[i] == "undefined")
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+//=========================================================
+// GET function
+//=========================================================
+
+function SendTextMessage(req, res)
+{
+    if (CheckPa(req.query.id, req.query.cdk, req.query.text))
+    {
+        res.send("10001");
+        return;
+    }
+
+    var AI = new AIAgant.Agent.AIAgent(req.query.id, req.query.cdk);
+    AI.GetTextTouch(req.query.text)
+    res.send("10000");
+}
+
+
+//=========================================================
+// Post function
+//=========================================================

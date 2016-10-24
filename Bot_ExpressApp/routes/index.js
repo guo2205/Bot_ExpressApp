@@ -9,7 +9,6 @@ function index(req, res) {
         var messagePath = Data.WebChatConfig.path + "/" + conversationId + "/messages";
         Data.Data.httpRequest(Data.WebChatConfig.host, messagePath, Data.WebChatConfig.port, "GET", Data.WebChatConfig.postheaders, null, function (message) {
             res.send(message);
-            
         });
     });
 }

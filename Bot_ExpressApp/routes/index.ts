@@ -1,4 +1,4 @@
-﻿/*
+﻿ /*
  * GET home page.
  */
 ///<reference path="../Data.ts" />
@@ -15,7 +15,6 @@ export function index(req: express.Request, res: express.Response) {
         Data.Data.httpRequest(Data.WebChatConfig.host, messagePath, Data.WebChatConfig.port, "GET", Data.WebChatConfig.postheaders, null, function (message) {
             res.send(message);
         });
-
     });
 };
 
