@@ -1,5 +1,7 @@
 "use strict";
 var https = require('https');
+var redisHelper = require("./DBH/RedisHelper");
+var enumclass = require("./Enum");
 var Data = (function () {
     function Data() {
     }
@@ -28,6 +30,34 @@ var Data = (function () {
     return Data;
 }());
 exports.Data = Data;
+function GetUnifiedJson(deviceCDK, fun) {
+    var redis = new redisHelper.Redis(enumclass.RedisCollection.UserIntents);
+    redis.GetList(deviceCDK, function (err, res) {
+        redis.RemoveData(deviceCDK, function () { });
+        redis.Quit();
+        var arrayCode = [];
+        var arrayText = [];
+        var arrayTime = [];
+        for (var i = 0; i < res.length; i++) {
+            var json = JSON.parse(res[i]);
+            arrayCode.push(json.co);
+            arrayText.push(json.txt);
+            if (json.clientTime != undefined)
+                arrayTime.push(json.clientTime);
+            else
+                arrayTime.push('');
+        }
+        var resJson = { 'co': arrayCode, 'txt': arrayText, 'time': arrayTime };
+        fun(resJson);
+    });
+    /*
+    redis.SetItemToList("123123", '{"co":"10000","txt":["' + testText + '"]}', (err, res) => {
+        console.log(res);
+        redis.Quit();
+    });
+    */
+}
+exports.GetUnifiedJson = GetUnifiedJson;
 var WebChatConfig = (function () {
     function WebChatConfig() {
     }

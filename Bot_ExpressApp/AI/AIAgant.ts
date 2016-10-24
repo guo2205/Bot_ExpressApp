@@ -80,7 +80,7 @@ export module Agent
                 testText = testText.replace('{' + strArray[o] + '}', SpeechPa[strArray[o]]);
             }
             var redis = new redisHelper.Redis(enumclass.RedisCollection.UserIntents);
-            redis.SetItemToList("123123", '{"co":"10000","txt":["' + testText + '"]}', (err, res) => {
+            redis.SetItemToList("123123", '{"co":10000,"txt":["' + testText + '"]}', (err, res) => {
                 console.log(res);
                 redis.Quit();
             });

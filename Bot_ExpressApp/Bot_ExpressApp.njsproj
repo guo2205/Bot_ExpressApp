@@ -96,7 +96,6 @@ MICROSOFT_APP_ID=11f5e522-a973-4113-bef6-090da3c8425a</Environment>
     <Folder Include="DBH\" />
     <Folder Include="Entity\" />
     <Folder Include="Intent\" />
-    <Folder Include="NewFolder1\" />
     <Folder Include="Action\" />
     <Folder Include="zhengshu\" />
     <Folder Include="routes\" />

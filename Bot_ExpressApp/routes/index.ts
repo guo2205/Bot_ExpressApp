@@ -5,6 +5,7 @@
 import express = require('express');
 import * as Data from "../Data";
 
+
 export function index(req: express.Request, res: express.Response) {
     var conversationRes: string = null;
     Data.Data.httpRequest(Data.WebChatConfig.host, Data.WebChatConfig.path, Data.WebChatConfig.port, Data.WebChatConfig.method, Data.WebChatConfig.postheaders, null, function (message) {
@@ -17,7 +18,13 @@ export function index(req: express.Request, res: express.Response) {
         });
     });
 };
-
+export function GetMessage(req: express.Request, res: express.Response)
+{
+    var deviceCDK: string = req.query['deviceCDK'];
+    Data.GetUnifiedJson(deviceCDK, function (resJson) {
+        res.send(JSON.stringify(resJson));
+    });
+}
 export function about(req: express.Request, res: express.Response) {
     res.render('about', { title: 'About', year: new Date().getFullYear(), message: 'Your application description page' });
 };

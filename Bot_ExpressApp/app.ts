@@ -45,6 +45,7 @@ app.get('/bot', routes.bot);
 app.get('/home', (req, res) => { var x = req.query.qq; res.send("qq" + x); });
 app.get('/api/messages', (req, res) => { res.send("GET api/messages") });
 app.get('/api/sendtextmessage', SendTextMessage);
+app.get('/api/GetMessage', routes.GetMessage);
 
 //=========================================================
 // Post Bind
@@ -93,13 +94,13 @@ function CheckPa(...args: string[]): boolean
  * @param CDK
  * @param callback
  */
-function CheckCDK(CDK: string, callback) {
-    let userdao: dao.utilDao = new dao.utilDao();
-    let para = new db.param();
-    para.tableName = 'device';
-    para.whereField = [{ key: 'deviceCDK', value: CDK }];
-    userdao.select(para, (obj: db.result) => { callback });
-}
+//function CheckCDK(CDK: string, callback) {
+//    let userdao: dao.utilDao = new dao.utilDao();
+//    let para = new db.param();
+//    para.tableName = 'device';
+//    para.whereField = [{ key: 'deviceCDK', value: CDK }];
+//    userdao.select(para, (obj: db.result) => { callback });？
+//}
 
 
 //=========================================================
@@ -117,12 +118,12 @@ function SendTextMessage(req, res)
         return;
     }
 
-    CheckCDK(req.query.cdk, (obj: db.result) =>
-    {
-        let json: Object = JSON.parse(obj.info);
-        id = json["id"];
-        familyId = json["familyID"];
-    });
+    //CheckCDK(req.query.cdk, (obj: db.result) =>
+    //{
+    //    let json: Object = JSON.parse(obj.info);
+    //    id = json["id"];
+    //    familyId = json["familyID"];
+    //});
 
     var AI = new AIAgant.Agent.AIAgent(req.query.id, req.query.cdk);
     AI.GetTextTouch(req.query.text)

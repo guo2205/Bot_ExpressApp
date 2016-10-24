@@ -14,6 +14,13 @@ function index(req, res) {
 }
 exports.index = index;
 ;
+function GetMessage(req, res) {
+    var deviceCDK = req.query['deviceCDK'];
+    Data.GetUnifiedJson(deviceCDK, function (resJson) {
+        res.send(JSON.stringify(resJson));
+    });
+}
+exports.GetMessage = GetMessage;
 function about(req, res) {
     res.render('about', { title: 'About', year: new Date().getFullYear(), message: 'Your application description page' });
 }

@@ -1,4 +1,6 @@
 ﻿import https = require('https');
+import redisHelper = require("./DBH/RedisHelper");
+import enumclass = require("./Enum");
 export class Data {
     static httpRequest(host: string, path: string, port: number, method: string, postheaders: {}, bady: {}, fun: Function) {
         var flg: boolean = false;
@@ -24,6 +26,35 @@ export class Data {
         });
 
     }
+}
+
+export function GetUnifiedJson(deviceCDK: string, fun: Function) {
+    var redis = new redisHelper.Redis(enumclass.RedisCollection.UserIntents);
+    redis.GetList(deviceCDK, function (err, res: string[]) {
+        redis.RemoveData(deviceCDK, () => { });
+        redis.Quit();
+        var arrayCode: number[] = [];
+        var arrayText: string[] = [];
+        var arrayTime: string[] = [];
+        for (var i = 0; i < res.length; i++) {
+            var json: { co: number; txt: string; clientTime: string; } = JSON.parse(res[i]);
+            arrayCode.push(json.co);
+            arrayText.push(json.txt);
+            if (json.clientTime != undefined)
+                arrayTime.push(json.clientTime);
+            else
+                arrayTime.push('');
+        }
+        var resJson = { 'co': arrayCode, 'txt': arrayText, 'time': arrayTime };
+        fun(resJson);
+
+    });
+    /*
+    redis.SetItemToList("123123", '{"co":"10000","txt":["' + testText + '"]}', (err, res) => {
+        console.log(res);
+        redis.Quit();
+    });
+    */
 }
 export class WebChatConfig
 {
