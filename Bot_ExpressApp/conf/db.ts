@@ -24,6 +24,12 @@ export class param
     whereField: { key: string, value: any }[] = [];
 }
 
+export class sqlField
+{
+    sql: string = "";
+    arr: any[] = [];
+}
+
 export class result
 {
     code: string = "";

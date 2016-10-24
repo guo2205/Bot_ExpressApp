@@ -6,6 +6,8 @@ var http = require('http');
 var path = require('path');
 var SHD = require("./SHD");
 var AIAgant = require('./AI/AIAgant');
+var db = require("./conf/db");
+var dao = require("./dao/UtilsDao");
 var app = express();
 var bot = new SHD.Bot();
 // all environments
@@ -71,14 +73,33 @@ function CheckPa() {
     }
     return false;
 }
+/**
+ *
+ * @param CDK
+ * @param callback
+ */
+function CheckCDK(CDK, callback) {
+    var userdao = new dao.utilDao();
+    var para = new db.param();
+    para.tableName = 'device';
+    para.whereField = [{ key: 'deviceCDK', value: CDK }];
+    userdao.select(para, function (obj) { callback; });
+}
 //=========================================================
 // GET function
 //=========================================================
 function SendTextMessage(req, res) {
+    var id;
+    var familyId;
     if (CheckPa(req.query.id, req.query.cdk, req.query.text)) {
         res.send("10001");
         return;
     }
+    CheckCDK(req.query.cdk, function (obj) {
+        var json = JSON.parse(obj.info);
+        id = json["id"];
+        familyId = json["familyID"];
+    });
     var AI = new AIAgant.Agent.AIAgent(req.query.id, req.query.cdk);
     AI.GetTextTouch(req.query.text);
     res.send("10000");

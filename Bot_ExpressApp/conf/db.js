@@ -21,6 +21,14 @@ var param = (function () {
     return param;
 }());
 exports.param = param;
+var sqlField = (function () {
+    function sqlField() {
+        this.sql = "";
+        this.arr = [];
+    }
+    return sqlField;
+}());
+exports.sqlField = sqlField;
 var result = (function () {
     function result(code, msg, info) {
         this.code = "";

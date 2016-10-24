@@ -7,6 +7,9 @@ import ejs = require('ejs');
 import path = require('path');
 import * as SHD from "./SHD";
 import AIAgant = require('./AI/AIAgant');
+import mysql = require('mysql');
+import * as db from "./conf/db";
+import * as dao from "./dao/UtilsDao";
 var app = express();
 var bot = new SHD.Bot();
 
@@ -85,17 +88,41 @@ function CheckPa(...args: string[]): boolean
     return false;
 }
 
+/**
+ * 
+ * @param CDK
+ * @param callback
+ */
+function CheckCDK(CDK: string, callback) {
+    let userdao: dao.utilDao = new dao.utilDao();
+    let para = new db.param();
+    para.tableName = 'device';
+    para.whereField = [{ key: 'deviceCDK', value: CDK }];
+    userdao.select(para, (obj: db.result) => { callback });
+}
+
+
 //=========================================================
 // GET function
 //=========================================================
 
 function SendTextMessage(req, res)
 {
+    let id: string;
+    let familyId: string;
+     
     if (CheckPa(req.query.id, req.query.cdk, req.query.text))
     {
         res.send("10001");
         return;
     }
+
+    CheckCDK(req.query.cdk, (obj: db.result) =>
+    {
+        let json: Object = JSON.parse(obj.info);
+        id = json["id"];
+        familyId = json["familyID"];
+    });
 
     var AI = new AIAgant.Agent.AIAgent(req.query.id, req.query.cdk);
     AI.GetTextTouch(req.query.text)
