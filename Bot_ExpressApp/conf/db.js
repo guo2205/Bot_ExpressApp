@@ -6,8 +6,8 @@
 exports.mysql = {
     host: '10.10.3.52',
     user: 'root',
-    password: 'root',
-    database: 'mypassword',
+    password: 'mypassword',
+    database: 'ZhiNengJiaJu',
     port: 3306
 };
 exports.sql = {

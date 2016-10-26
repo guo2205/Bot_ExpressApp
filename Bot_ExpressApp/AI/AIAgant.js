@@ -3,14 +3,15 @@ var https = require("https");
 var Intent = require("../Intent/Iintent");
 var redisHelper = require("../DBH/RedisHelper");
 var enumclass = require("../Enum");
+var db = require("../conf/db");
+var dao = require("../dao/UtilsDao");
 var Agent;
 (function (Agent) {
     var AIAgent = (function () {
-        function AIAgent(_ID, _CDK) {
+        function AIAgent(_deviceCDK) {
             this.AIAgentData = { ID: 0, CID: 0, CDK: "", EmotionLV: 3 };
-            this.AIAgentData.ID = _ID;
             this.AIAgentData.CID = 101;
-            this.AIAgentData.CDK = _CDK;
+            this.AIAgentData.CDK = _deviceCDK;
             this.AIAgentData.EmotionLV = 3;
             this.intentMgr = new Intent.Intent.IntentMgr();
         }
@@ -46,16 +47,24 @@ var Agent;
             return;
         };
         AIAgent.prototype.OnIntentCompleted = function (SpeechCode, SpeechPa) {
+            var _this = this;
+            //console.log(SpeechCode);
             //console.log(SpeechPa);
-            var testText = '{city}的天气，最高温度是{t_max}度,最低温度是{t_min}度';
-            var strArray = this.getSubstr(testText);
-            for (var o in strArray) {
-                testText = testText.replace('{' + strArray[o] + '}', SpeechPa[strArray[o]]);
-            }
-            var redis = new redisHelper.Redis(enumclass.RedisCollection.UserIntents);
-            redis.SetItemToList("123123", '{"co":10000,"txt":["' + testText + '"]}', function (err, res) {
-                console.log(res);
-                redis.Quit();
+            var userdao = new dao.utilDao();
+            var para = new db.param();
+            para.tableName = 'ManSpeechModel';
+            para.whereField = [{ key: 'SpeechCode', value: SpeechCode }];
+            userdao.select(para, function (obj) {
+                console.log(JSON.stringify(obj.info));
+                var testText = obj.info[0].SpeechModel;
+                var strArray = _this.getSubstr(testText);
+                for (var o in strArray) {
+                    testText = testText.replace('{' + strArray[o] + '}', SpeechPa[strArray[o]]);
+                }
+                var redis = new redisHelper.Redis(enumclass.RedisCollection.UserIntents);
+                redis.SetItemToList(_this.AIAgentData.CDK, '{"co":10000,"txt":["' + testText + '"]}', function (err, res) {
+                    redis.Quit();
+                });
             });
         };
         AIAgent.prototype.getSubstr = function (str, strs, stre) {

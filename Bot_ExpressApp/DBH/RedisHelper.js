@@ -31,14 +31,17 @@ var Redis = (function () {
     //        this.RC.expire(x.key, x.expire);
     //    }
     //}
-    //存入一段字符串并设置时间如果key有就覆盖
-    Redis.prototype.SetStringAndExpire = function (key, value, expire, fun) {
-        this.RC.set(key, value);
-        this.RC.expire(key, expire, fun);
-    };
+    ////存入一段字符串并设置时间如果key有就覆盖
+    //public SetStringAndExpire(key: any, value: any, expire: number, fun?: ResCallbackT<any>)
+    //{
+    //    this.RC.set(key, value);
+    //    this.RC.expire(key, expire, fun);
+    //}
     //存入一段字符串如果key有就覆盖
-    Redis.prototype.SetString = function (key, value, fun) {
+    Redis.prototype.SetString = function (key, value, fun, expire) {
         this.RC.set(key, value, fun);
+        if (expire > 0)
+            this.RC.expire(key, expire, fun);
     };
     //存入一段字符串如果key有则不存
     Redis.prototype.SetValueNX = function (key, value, fun) {
@@ -61,17 +64,23 @@ var Redis = (function () {
         this.RC.randomkey(fun);
     };
     //-----------------------------------------------list 的操作
-    //存入数据---默认往上存
-    Redis.prototype.SetItemToList = function (key, value, fun) {
+    //存入数据---默认(后一个数据在前一个上面)
+    Redis.prototype.SetItemToList = function (key, value, fun, expire) {
         this.RC.lpush(key, value, fun);
+        if (expire > 0)
+            this.RC.expire(key, expire, fun);
     };
-    //存入数据---往上存
-    Redis.prototype.SetItemToList_Left = function (key, value, fun) {
+    //存入数据---(后一个数据在前一个上面)
+    Redis.prototype.SetItemToList_Left = function (key, value, fun, expire) {
         this.RC.lpush(key, value, fun);
+        if (expire > 0)
+            this.RC.expire(key, expire, fun);
     };
-    //存入数据---往下存
-    Redis.prototype.SetItemToList_Right = function (key, value, fun) {
+    //存入数据---(后一个数据在前一个下面)
+    Redis.prototype.SetItemToList_Right = function (key, value, expire, fun) {
         this.RC.rpush(key, value, fun);
+        if (expire > 0)
+            this.RC.expire(key, expire, fun);
     };
     //获得列表数据
     Redis.prototype.GetList = function (key, fun) {
@@ -91,17 +100,21 @@ var Redis = (function () {
     //-----------------------------------------------
     //-----------------------------------------------Hash 的操作
     //存入一条数据
-    Redis.prototype.SetItemToHash = function (key, fieldKey, fieldValue, fun) {
+    Redis.prototype.SetItemToHash = function (key, fieldKey, fieldValue, fun, expire) {
         this.RC.hset(key, fieldKey, fieldValue, fun);
+        if (expire > 0)
+            this.RC.expire(key, expire, fun);
     };
     //存入很多数据 -----要改
-    Redis.prototype.SetItemsToHash = function (key, field, string, fun) {
+    Redis.prototype.SetItemsToHash = function (key, field, fun, expire) {
         var list = [];
         for (var i = 1; i < field.length; i++) {
             list.push(field[i].fieldKey);
             list.push(field[i].fieldValue);
         }
         this.RC.hmset(key, list, fun);
+        if (expire > 0)
+            this.RC.expire(key, expire, fun);
     };
     //取对应键的值
     Redis.prototype.GetItemFromHash = function (key, fieldKey, fun) {

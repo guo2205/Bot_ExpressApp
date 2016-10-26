@@ -1,4 +1,4 @@
-﻿module Entity
+﻿namespace Entity
 {
     export var citylist =
     {

@@ -112,7 +112,7 @@ function SendTextMessage(req, res)
     let id: string;
     let familyId: string;
      
-    if (CheckPa(req.query.id, req.query.cdk, req.query.text))
+    if (CheckPa(req.query.status,req.query.deviceCDK, req.query.text))
     {
         res.send("10001");
         return;
@@ -124,10 +124,17 @@ function SendTextMessage(req, res)
     //    id = json["id"];
     //    familyId = json["familyID"];
     //});
-
-    var AI = new AIAgant.Agent.AIAgent(req.query.id, req.query.cdk);
-    AI.GetTextTouch(req.query.text)
-    res.send("10000");
+    switch (req.query.status)
+    {
+        case "1":
+            var AI = new AIAgant.Agent.AIAgent(req.query.deviceCDK);
+            AI.GetTextTouch(req.query.text)
+            res.send("10000");
+            break;
+        default:
+            res.send("10002");
+            break;
+    }
 }
 
 

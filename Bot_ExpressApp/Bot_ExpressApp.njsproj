@@ -42,7 +42,6 @@ MICROSOFT_APP_ID=11f5e522-a973-4113-bef6-090da3c8425a</Environment>
     <TypeScriptCompile Include="Data.ts" />
     <TypeScriptCompile Include="DBH\RedisHelper.ts" />
     <TypeScriptCompile Include="Entity\EntityConfig.ts" />
-    <TypeScriptCompile Include="Entity\Entity_City.ts" />
     <TypeScriptCompile Include="Entity\IEntity.ts" />
     <TypeScriptCompile Include="Enum.ts" />
     <TypeScriptCompile Include="Intent\Iintent.ts" />
@@ -71,9 +70,6 @@ MICROSOFT_APP_ID=11f5e522-a973-4113-bef6-090da3c8425a</Environment>
     <Content Include="cmodule\build\Release\obj\hello\vc140.pdb" />
     <Content Include="cmodule\build\Release\obj\hello\win_delay_load_hook.obj" />
     <Content Include="cmodule\hello.cc" />
-    <Content Include="Entity\EntityConfig.js.map" />
-    <Content Include="Entity\Entity_City.js.map" />
-    <Content Include="Entity\IEntity.js.map" />
     <Content Include="Intent\Iintent.js.map" />
     <Content Include="package.json" />
     <Content Include="README.md" />
@@ -113,9 +109,6 @@ MICROSOFT_APP_ID=11f5e522-a973-4113-bef6-090da3c8425a</Environment>
   <ItemGroup>
     <Compile Include="AI\AIAgant.js" />
     <Compile Include="cmodule\test.js" />
-    <Compile Include="Entity\EntityConfig.js" />
-    <Compile Include="Entity\Entity_City.js" />
-    <Compile Include="Entity\IEntity.js" />
     <Compile Include="Intent\Iintent.js" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->

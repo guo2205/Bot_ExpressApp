@@ -4,6 +4,8 @@ import https = require("https");
 import Intent = require("../Intent/Iintent");
 import redisHelper = require("../DBH/RedisHelper");
 import enumclass = require("../Enum");
+import * as db from "../conf/db";
+import * as dao from "../dao/UtilsDao";
 
 export module Agent
 {
@@ -14,7 +16,7 @@ export module Agent
         //CID 角色对应的ID
         CID: number; 
         //设备的cdk
-         CDK: string;
+        CDK: string;
         //情绪的等级
         EmotionLV: number;
     }
@@ -25,11 +27,10 @@ export module Agent
 
         private intentMgr: Intent.Intent.IntentMgr;
 
-        constructor(_ID: number, _CDK: string)
+        constructor(_deviceCDK: string)
         {
-            this.AIAgentData.ID = _ID;
             this.AIAgentData.CID = 101;
-            this.AIAgentData.CDK = _CDK;
+            this.AIAgentData.CDK = _deviceCDK;
             this.AIAgentData.EmotionLV = 3;
             this.intentMgr=new Intent.Intent.IntentMgr();
         }
@@ -72,17 +73,23 @@ export module Agent
 
 
         private OnIntentCompleted(SpeechCode: number, SpeechPa: Object) {
+            //console.log(SpeechCode);
             //console.log(SpeechPa);
-            var testText: string = '{city}的天气，最高温度是{t_max}度,最低温度是{t_min}度';
-            var strArray: string[] = this.getSubstr(testText);
-            for (var o in strArray)
-            {
-                testText = testText.replace('{' + strArray[o] + '}', SpeechPa[strArray[o]]);
-            }
-            var redis = new redisHelper.Redis(enumclass.RedisCollection.UserIntents);
-            redis.SetItemToList("123123", '{"co":10000,"txt":["' + testText + '"]}', (err, res) => {
-                console.log(res);
-                redis.Quit();
+            let userdao: dao.utilDao = new dao.utilDao();
+            let para = new db.param();
+            para.tableName = 'ManSpeechModel';
+            para.whereField = [{ key: 'SpeechCode', value: SpeechCode }];
+            userdao.select(para, (obj: db.result) => {
+                console.log(JSON.stringify(obj.info));
+                var testText: string = obj.info[0].SpeechModel;
+                var strArray: string[] = this.getSubstr(testText);
+                for (var o in strArray) {
+                    testText = testText.replace('{' + strArray[o] + '}', SpeechPa[strArray[o]]);
+                }
+                var redis = new redisHelper.Redis(enumclass.RedisCollection.UserIntents);
+                redis.SetItemToList(this.AIAgentData.CDK, '{"co":10000,"txt":["' + testText + '"]}', (err, res) => {
+                    redis.Quit();
+                });
             });
         }
 
@@ -106,5 +113,9 @@ export module Agent
             }
             return array;
         }
+
+
+
+
     }
 }
