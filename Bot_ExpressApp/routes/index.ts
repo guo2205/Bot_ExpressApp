@@ -4,7 +4,10 @@
 ///<reference path="../Data.ts" />
 import express = require('express');
 import * as Data from "../Data";
-
+import AIAgant = require('../AI/AIAgant');
+import mysql = require('mysql');
+import * as db from "../conf/db";
+import * as dao from "../dao/UtilsDao";
 
 export function index(req: express.Request, res: express.Response) {
     var conversationRes: string = null;
@@ -18,6 +21,35 @@ export function index(req: express.Request, res: express.Response) {
         });
     });
 };
+
+export function SendTextMessage(req, res) {
+    if (Data.Data.CheckPa(req.query.status, req.query.deviceCDK, req.query.text)) {
+        res.send("10001");
+        return;
+    }
+    //CheckCDK(req.query.cdk, (obj: db.result) =>
+    //{
+    //    let json: Object = JSON.parse(obj.info);
+    //    id = json["id"];
+    //    familyId = json["familyID"];
+    //});
+    switch (req.query.status) {
+        case "1":
+            Data.Data.deviceCDKToFamilyId(req.query.deviceCDK, function (familyID: number) {
+                if (familyID > 0) {
+                    var AI = new AIAgant.Agent.AIAgent(req.query.deviceCDK, familyID);
+                    AI.GetTextTouch(req.query.text)
+                    res.send("10000");
+                }
+                else
+                    res.send("10001");
+            });
+            break;
+        default:
+            res.send("10002");
+            break;
+    }
+}
 export function GetMessage(req: express.Request, res: express.Response)
 {
     var deviceCDK: string = req.query['deviceCDK'];

@@ -240,7 +240,7 @@ export module Intent {
                 }
             }
             var redis = new redisHelper.Redis(enumclass.RedisCollection.MicrosoftLUIS);
-            redis.SetItemToHash(IntentObject.AIagentData.ID, IntentObject.name(),JSON.stringify(IntentJson), (err, res) => {
+            redis.SetItemToHash(IntentObject.AIagentData.familyID, IntentObject.name(),JSON.stringify(IntentJson), (err, res) => {
                 if (err) {
                     console.log(err);
                     redis.Quit();
@@ -249,7 +249,7 @@ export module Intent {
                 {
                     if ((res as number)>5)
                     {
-                        redis.DeleteLastItemFromList(IntentObject.AIagentData.ID, (err, res) => { redis.Quit(); });
+                        redis.DeleteLastItemFromList(IntentObject.AIagentData.familyID, (err, res) => { redis.Quit(); });
                     }
                 }        
            });
@@ -259,7 +259,7 @@ export module Intent {
         {
 
             var redis = new redisHelper.Redis(enumclass.RedisCollection.MicrosoftLUIS);
-            redis.GetItemFromHash(_AIagentData.ID, LUISIntentObject.name, (err, res) =>
+            redis.GetItemFromHash(_AIagentData.familyID, LUISIntentObject.name, (err, res) =>
             {
                 if (err) {
                     console.log("ReadIntent err :"+err);

@@ -2,9 +2,23 @@
 var https = require('https');
 var redisHelper = require("./DBH/RedisHelper");
 var enumclass = require("./Enum");
+var db = require("./conf/db");
+var dao = require("./dao/UtilsDao");
 var Data = (function () {
     function Data() {
     }
+    Data.CheckPa = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i - 0] = arguments[_i];
+        }
+        for (var i = 0; i < args.length; i++) {
+            if (typeof args[i] == "undefined") {
+                return true;
+            }
+        }
+        return false;
+    };
     Data.httpRequest = function (host, path, port, method, postheaders, bady, fun) {
         var flg = false;
         var num = 0;
@@ -25,6 +39,20 @@ var Data = (function () {
         reqPost.end();
         reqPost.on('error', function (e) {
             console.error(e);
+        });
+    };
+    Data.deviceCDKToFamilyId = function (deviceCDK, fun) {
+        var userdao = new dao.utilDao();
+        var para = new db.param();
+        para.tableName = 'device';
+        para.whereField = [{ key: 'deviceCDK', value: deviceCDK }];
+        userdao.select(para, function (obj) {
+            if (parseInt(obj.code) > 0) {
+                fun(0);
+            }
+            else {
+                fun(parseInt(obj.info[0].familyID));
+            }
         });
     };
     return Data;

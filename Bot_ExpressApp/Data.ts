@@ -1,7 +1,19 @@
 ﻿import https = require('https');
 import redisHelper = require("./DBH/RedisHelper");
 import enumclass = require("./Enum");
+import * as db from "./conf/db";
+import * as dao from "./dao/UtilsDao";
+
 export class Data {
+    static CheckPa(...args: string[]): boolean {
+        for (var i: number = 0; i < args.length; i++) {
+            if (typeof args[i] == "undefined") {
+                return true;
+            }
+        }
+        return false;
+    }
+
     static httpRequest(host: string, path: string, port: number, method: string, postheaders: {}, bady: {}, fun: Function) {
         var flg: boolean = false;
         var num: number = 0;
@@ -24,7 +36,23 @@ export class Data {
         reqPost.on('error', function (e) {
             console.error(e);
         });
+    }
 
+    static deviceCDKToFamilyId(deviceCDK: string, fun: Function) {
+        var userdao: dao.utilDao = new dao.utilDao();
+        var para = new db.param();
+        para.tableName = 'device';
+        para.whereField = [{ key: 'deviceCDK', value: deviceCDK }];
+        userdao.select(para, (obj: db.result) => {
+            if (parseInt(obj.code) > 0) {
+                fun(0);
+            }
+            else
+            {
+                fun(parseInt(obj.info[0].familyID));
+            }
+        });
+        
     }
 }
 

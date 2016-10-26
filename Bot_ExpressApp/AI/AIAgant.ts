@@ -12,7 +12,7 @@ export module Agent
     export interface IAIAgentData
     {
         //ID  机器人唯一的标识 一个家庭一个
-        ID: number;
+        familyID: number;
         //CID 角色对应的ID
         CID: number; 
         //设备的cdk
@@ -23,12 +23,13 @@ export module Agent
 
     export class AIAgent {
 
-        private AIAgentData: IAIAgentData = { ID: 0, CID: 0, CDK: "", EmotionLV: 3 };
+        private AIAgentData: IAIAgentData = { familyID: 0, CID: 0, CDK: "", EmotionLV: 3 };
 
         private intentMgr: Intent.Intent.IntentMgr;
 
-        constructor(_deviceCDK: string)
+        constructor(_deviceCDK: string, _familyID: number)
         {
+            this.AIAgentData.familyID = _familyID;
             this.AIAgentData.CID = 101;
             this.AIAgentData.CDK = _deviceCDK;
             this.AIAgentData.EmotionLV = 3;
@@ -75,8 +76,8 @@ export module Agent
         private OnIntentCompleted(SpeechCode: number, SpeechPa: Object) {
             //console.log(SpeechCode);
             //console.log(SpeechPa);
-            let userdao: dao.utilDao = new dao.utilDao();
-            let para = new db.param();
+            var userdao: dao.utilDao = new dao.utilDao();
+            var para = new db.param();
             para.tableName = 'ManSpeechModel';
             para.whereField = [{ key: 'SpeechCode', value: SpeechCode }];
             userdao.select(para, (obj: db.result) => {

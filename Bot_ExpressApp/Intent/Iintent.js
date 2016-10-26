@@ -166,14 +166,14 @@ var Intent;
                 }
             }
             var redis = new redisHelper.Redis(enumclass.RedisCollection.MicrosoftLUIS);
-            redis.SetItemToHash(IntentObject.AIagentData.ID, IntentObject.name(), JSON.stringify(IntentJson), function (err, res) {
+            redis.SetItemToHash(IntentObject.AIagentData.familyID, IntentObject.name(), JSON.stringify(IntentJson), function (err, res) {
                 if (err) {
                     console.log(err);
                     redis.Quit();
                 }
                 else {
                     if (res > 5) {
-                        redis.DeleteLastItemFromList(IntentObject.AIagentData.ID, function (err, res) { redis.Quit(); });
+                        redis.DeleteLastItemFromList(IntentObject.AIagentData.familyID, function (err, res) { redis.Quit(); });
                     }
                 }
             });
@@ -181,7 +181,7 @@ var Intent;
         IntentMgr.prototype.ReadIntent = function (_AIagentData, LUISIntentObject, callback) {
             var _this = this;
             var redis = new redisHelper.Redis(enumclass.RedisCollection.MicrosoftLUIS);
-            redis.GetItemFromHash(_AIagentData.ID, LUISIntentObject.name, function (err, res) {
+            redis.GetItemFromHash(_AIagentData.familyID, LUISIntentObject.name, function (err, res) {
                 if (err) {
                     console.log("ReadIntent err :" + err);
                     redis.Quit();

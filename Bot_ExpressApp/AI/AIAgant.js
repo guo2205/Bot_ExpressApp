@@ -8,8 +8,9 @@ var dao = require("../dao/UtilsDao");
 var Agent;
 (function (Agent) {
     var AIAgent = (function () {
-        function AIAgent(_deviceCDK) {
-            this.AIAgentData = { ID: 0, CID: 0, CDK: "", EmotionLV: 3 };
+        function AIAgent(_deviceCDK, _familyID) {
+            this.AIAgentData = { familyID: 0, CID: 0, CDK: "", EmotionLV: 3 };
+            this.AIAgentData.familyID = _familyID;
             this.AIAgentData.CID = 101;
             this.AIAgentData.CDK = _deviceCDK;
             this.AIAgentData.EmotionLV = 3;
