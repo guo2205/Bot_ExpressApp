@@ -1,4 +1,5 @@
 ﻿import https = require('https');
+import http = require('http');
 import redisHelper = require("./DBH/RedisHelper");
 import enumclass = require("./Enum");
 import * as db from "./conf/db";
@@ -17,14 +18,37 @@ export class Data {
     static httpRequest(host: string, path: string, port: number, method: string, postheaders: {}, bady: {}, fun: Function) {
         var flg: boolean = false;
         var num: number = 0;
-        var option =
-            {
-                host: host,
-                port: port,
-                path: path,
-                method: method,
-                headers: postheaders
-            };
+        var option = {
+            host: host,
+            port: port,
+            path: path,
+            method: method,
+            headers: postheaders
+        };
+        var reqPost = http.request(option, function (resPost) {
+            resPost.setEncoding('utf8');
+            resPost.on('data', fun);
+        });
+        if (bady != null) {
+            reqPost.write(JSON.stringify(bady));
+        }
+        reqPost.end();
+        reqPost.on('error', function (e) {
+            //console.error(e);
+            fun(e);
+        });
+    }
+
+    static httpsRequest(host: string, path: string, port: number, method: string, postheaders: {}, bady: {}, fun: Function) {
+        var flg: boolean = false;
+        var num: number = 0;
+        var option = {
+            host: host,
+            port: port,
+            path: path,
+            method: method,
+            headers: postheaders
+        };
         var reqPost = https.request(option, function (resPost) {
             resPost.setEncoding('utf8');
             resPost.on('data', fun);
@@ -45,11 +69,11 @@ export class Data {
         para.whereField = [{ key: 'deviceCDK', value: deviceCDK }];
         userdao.select(para, (obj: db.result) => {
             if (parseInt(obj.code) > 0) {
-                fun(0);
+                fun(parseInt(obj.info[0].familyID));    
             }
             else
             {
-                fun(parseInt(obj.info[0].familyID));
+                fun(0);
             }
         });
         
@@ -57,25 +81,18 @@ export class Data {
 }
 
 export function GetUnifiedJson(deviceCDK: string, fun: Function) {
-    var redis = new redisHelper.Redis(enumclass.RedisCollection.UserIntents);
+    var redis = new redisHelper.Redis(enumclass.RedisCollection.UserGetMessage);
     redis.GetList(deviceCDK, function (err, res: string[]) {
-        redis.RemoveData(deviceCDK, () => { });
-        redis.Quit();
-        var arrayCode: number[] = [];
-        var arrayText: string[] = [];
-        var arrayTime: string[] = [];
-        for (var i = 0; i < res.length; i++) {
-            var json: { co: number; txt: string; clientTime: string; } = JSON.parse(res[i]);
-            arrayCode.push(json.co);
-            arrayText.push(json.txt);
-            if (json.clientTime != undefined)
-                arrayTime.push(json.clientTime);
-            else
-                arrayTime.push('');
+        var jsonres: Object[] = [];
+        var jsonre: Object = null; 
+        for (var index in res)
+        {
+            jsonre = JSON.parse(res[index]);
+            jsonres.push(jsonre);
         }
-        var resJson = { 'co': arrayCode, 'txt': arrayText, 'time': arrayTime };
-        fun(resJson);
-
+        fun(jsonres);
+        redis.DeleteData(deviceCDK, () => { });
+        redis.Quit();
     });
     /*
     redis.SetItemToList("123123", '{"co":"10000","txt":["' + testText + '"]}', (err, res) => {

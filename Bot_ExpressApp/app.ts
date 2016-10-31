@@ -1,14 +1,18 @@
 ﻿///<reference path="SHD.ts" />
 
 import express = require('express');
+import multiparty = require('multiparty');
 import routes = require('./routes/index');
+import connect = require('connect');
+//import formidable = require('formidable');
+import util = require('util');
 import http = require('http');
 import ejs = require('ejs');
 import path = require('path');
 import * as SHD from "./SHD";
 
 var app = express();
-var bot = new SHD.Bot();
+var bot = new SHD.Bot();  
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -42,7 +46,9 @@ app.get('/bot', routes.bot);
 app.get('/home', (req, res) => { var x = req.query.qq; res.send("qq" + x); });
 app.get('/api/messages', (req, res) => { res.send("GET api/messages") });
 app.get('/api/sendtextmessage', routes.SendTextMessage);
-app.get('/api/GetMessage', routes.GetMessage);
+app.get('/api/getmessage', routes.GetMessage);
+app.post('/upload', )
+
 
 //=========================================================
 // Post Bind
@@ -69,3 +75,43 @@ var options = {
 https.createServer(options, app).listen(4444, function () {
     console.log('Https server listening on port ' + 4444);
 });
+
+/*上传*/
+app.post('/uploading',
+    function (req, res, next) {
+        //生成multiparty对象，并配置上传目标路径
+        var form = new multiparty.Form({ uploadDir: './public/log' });
+        //var form = new formidable.IncomingForm();
+        //上传处理
+        form.parse(req,
+            function (err, fields, files) {
+                var filesTmp: string = JSON.stringify(files, null, 2);
+
+                if (err) {
+                    console.log('err:' + err);
+                }
+                else {
+                    var inputFile = files.log[0];
+                    var uploadedPath = inputFile.path;
+                    var dstPath = 'public\\log\\' + inputFile.originalFilename;
+                    //重命名为真实文件名
+                    fs.rename(uploadedPath, dstPath,
+                        function (err) {
+                            if (err)
+                                console.log('rename error:' + err);
+                            else
+                                console.log('rename ok');
+                        }
+                    );
+                }
+                res.writeHead(200, { 'content-type': 'text/h323' });
+                console.log("123");
+                res.end();
+            }
+        );
+        form.on('error', function (err) {
+            //console.log('Error parsing form: ' + err.stack);
+        });
+    }
+
+);

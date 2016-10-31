@@ -46,6 +46,31 @@ export class Intent_None implements Iintent.Intent.IIntent {
 
     public AIagentData: AIagent.Agent.IAIAgentData;
 
+    constructor()
+    {
+
+    }
+}
+
+export class Intent_Shopping implements Iintent.Intent.IIntent {
+    public name(): string {
+        return "Shopping";
+    }
+
+    public entities: Object = { goodtype: new Entity.Entity.Entity_goodtype(), choosegood: new Entity.Entity.Entity_choosegood(), list: new Entity.Entity.Entity_list(), good: new Entity.Entity.Entity_good() };
+
+    public actions: Object = { RecommendGood: new Action.Action.action_RecommendGood(),OrderGood:new Action.Action.action_OrderGood()};
+
+    public execute: Object = {
+        "enter": "list",
+        "list": ["OrderGood", "goodtype"],
+        "goodtype": ["RecommendGood", 10003],
+        "RecommendGood": [10033, 10043],
+        "OrderGood": [10013,10053],
+    };
+
+    public AIagentData: AIagent.Agent.IAIAgentData;
+
     constructor() {
 
     }

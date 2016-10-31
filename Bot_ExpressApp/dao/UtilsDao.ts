@@ -1,9 +1,10 @@
-﻿///<reference path="userSqlMapping.ts" />
-///<reference path="../Scripts/typings/index.d.ts"/>
+﻿///<reference path="../Scripts/typings/index.d.ts"/>
 ///<reference path="../conf/db.ts"/>
+///<reference path="../utils/mysqlConn.ts"/>
 //实现与MySQL交互
 import mysql = require('mysql');
 import db = require('../conf/db');
+import conn = require('../utils/mysqlConn');
 
 export class utilDao {
 
@@ -15,7 +16,6 @@ export class utilDao {
      * 数据库sql执行方法
      * @param param 
      * @param callback 回调方法
-     */
     public query(sql: string, arr: Array<any>, callback: (msg: db.result) => any)
     {
         this.pool.getConnection((err, conn) =>
@@ -36,6 +36,7 @@ export class utilDao {
             });
         })
     }
+     */
 
     /**
      * 数据库记录查询方法(组装select语句)
@@ -44,21 +45,32 @@ export class utilDao {
      */
     public select(param: db.param, callback: (msg: db.result) => any)
     {
+        let myDate = new Date();
+        let start = myDate.getMilliseconds();
         // 'INSERT INTO user(id, name, age) VALUES(0,?,?)',
         let tableName: string = param.tableName;
         let whereField: { key: any, value: any }[] = param.whereField;
         let sql: string = `select * from ${tableName} where `;
         let arr: Array<any> = [];
+        let time1 = new Date();
+        console.log("start:" + (time1.getTime() - myDate.getTime()));
         //循环where条件生成SQL
         for (let i: number = 0; i < whereField.length; i++) {
             if (i > 0) {
                 sql += 'and '
             }
+            let time2 = new Date().getMilliseconds();
+            //console.log(time2 - time1);
         //select * from where a=?
             sql += whereField[i].key + "=? ";
             arr.push(whereField[i].value);
-        //调用sql执行方法
-            this.query(sql, arr, callback);
+            //调用sql执行方法
+            conn.query(sql, arr, (msg: db.result) => {
+                let time3 = new Date().getMilliseconds();
+                console.log(time3 - time2);
+                callback(msg);
+            });
+
         }
     }
 
@@ -83,7 +95,7 @@ export class utilDao {
             sql += whereField[i].key + "=? ";
             arr.push(whereField[i].value);
             //调用sql执行方法
-            this.query(sql, arr, callback);
+            conn.query(sql, arr, callback);
         }
     }
 
@@ -98,5 +110,4 @@ export class utilDao {
     }
 
 }
-
 

@@ -10,16 +10,6 @@ import * as db from "../conf/db";
 import * as dao from "../dao/UtilsDao";
 
 export function index(req: express.Request, res: express.Response) {
-    var conversationRes: string = null;
-    Data.Data.httpRequest(Data.WebChatConfig.host, Data.WebChatConfig.path, Data.WebChatConfig.port, Data.WebChatConfig.method, Data.WebChatConfig.postheaders, null, function (message) {
-        var json = JSON.parse(message);
-        var conversationId: string = json.conversationId;
-        var token: string = json.token;
-        var messagePath = Data.WebChatConfig.path + "/" + conversationId + "/messages";
-        Data.Data.httpRequest(Data.WebChatConfig.host, messagePath, Data.WebChatConfig.port, "GET", Data.WebChatConfig.postheaders, null, function (message) {
-            res.send(message);
-        });
-    });
 };
 
 export function SendTextMessage(req, res) {

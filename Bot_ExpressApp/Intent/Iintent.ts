@@ -7,11 +7,18 @@ import redisHelper = require("../DBH/RedisHelper");
 import enumclass = require("../Enum");
 
 export module Intent {
+    export interface IAIIntent
+    {
+        
+        Intent: string;
+        entity: string;
+    }
+ 
     export interface IIntent {
         name(): string;
-        entities: Object;
-        actions: Object;
-        execute: Object;
+        entities: Object; //{ "city": new Entity.Entity.Entity_City(), "data": new Entity.Entity.Entity_Data() }
+        actions: Object;  //{ "weather": new Action.Action.action_Weather() }
+        execute: Object;  //{"enter": "city","city": ["data", 2003],"data": ["weather", "weather"],"weather": [2023, 2033]};
         AIagentData: AIagent.Agent.IAIAgentData;
     }
 
@@ -57,6 +64,7 @@ export module Intent {
                 {
                     None: IntentObject.Intent_None,
                     QueryWeather: IntentObject.Intent_Weather,
+                    Shopping: IntentObject.Intent_Shopping,
                 };
         }
 
@@ -94,7 +102,7 @@ export module Intent {
                }
                else if (IntentObject.actions.hasOwnProperty(executeStepName))
                {
-                   var actionReq_: Action.Action.IActionReq = { entity: IntentObject.entities };
+                   var actionReq_: Action.Action.IActionReq = { AIAgentData: IntentObject.AIagentData, entity: IntentObject.entities };
                    (IntentObject.actions[executeStepName] as Action.Action.IAction).execute(actionReq_, (ActionRes: Action.Action.IActionRes) => {
                        if (ActionRes.res) {
                            if (typeof IntentObject.execute[executeStepName][0] == "number") {
@@ -127,7 +135,7 @@ export module Intent {
         //当意图执行完毕时调用
         private OnExecuteIntentFinish(IntentObject: IIntent)
         {
-            this.SaveIntentToRedis(IntentObject);
+            this.SaveUserIntentToRedis(IntentObject);
         }
 
         //Intent None;
@@ -208,7 +216,7 @@ export module Intent {
         }
 
     //执行LUIS过来的意图
-        public ExecuteIntent(intent: string, _AIagentData: AIagent.Agent.IAIAgentData, intentObject: LUISMainIntent,callback: (SpeechCode: number, SpeechPa: Object) => void)
+        public ExecuteLUISIntent(intent: string, _AIagentData: AIagent.Agent.IAIAgentData, intentObject: LUISMainIntent,callback: (SpeechCode: number, SpeechPa: Object) => void)
         {
             this.ReadIntent(_AIagentData, intentObject, (Intent: IIntent) => {
                 for (var key in Intent.entities) {
@@ -225,10 +233,15 @@ export module Intent {
             //var Intent: IIntent = new this.IntentDict[intent]();
             //Intent.AIagentData = _AIagentData;
         }
+        //执行手动创建的意图
+        public ExecuteIntent(intent: IIntent, callback: (SpeechCode: number, SpeechPa: Object) => void): void 
+        {
+            this.executeIntent(intent, "enter", callback)
+        }
 
 
-        //将意图存入数据库
-        public SaveIntentToRedis(IntentObject: IIntent)
+        //将用户意图存入数据库
+        public SaveUserIntentToRedis(IntentObject: IIntent)
         {
 
             var IntentJson: Object = {};
@@ -239,7 +252,7 @@ export module Intent {
                     IntentJson[(IntentObject.entities[key] as IEntity.Entity.IEntity).name] = (IntentObject.entities[key] as IEntity.Entity.IEntity).entity;
                 }
             }
-            var redis = new redisHelper.Redis(enumclass.RedisCollection.MicrosoftLUIS);
+            var redis = new redisHelper.Redis(enumclass.RedisCollection.UserIntents);
             redis.SetItemToHash(IntentObject.AIagentData.familyID, IntentObject.name(),JSON.stringify(IntentJson), (err, res) => {
                 if (err) {
                     console.log(err);
@@ -247,18 +260,40 @@ export module Intent {
                 }
                 else
                 {
-                    if ((res as number)>5)
-                    {
-                        redis.DeleteLastItemFromList(IntentObject.AIagentData.familyID, (err, res) => { redis.Quit(); });
-                    }
+                    if (parseInt(res)> 5)
+                   {
+                       //redis.DeleteLastItemFromList(IntentObject.AIagentData.familyID, (err, res) => { redis.Quit(); });
+                   }
                 }        
-           });
+           },60);
         }
 
+        //将AI意图存入数据库
+        public SaveAIIntentToRedis(IntentObject: IIntent) {
+            var IntentJson: Object = {};
+            for (var key in IntentObject.entities) {
+                if ((IntentObject.entities[key] as IEntity.Entity.IEntity).entity.length > 0) {
+                    IntentJson[(IntentObject.entities[key] as IEntity.Entity.IEntity).name] = (IntentObject.entities[key] as IEntity.Entity.IEntity).entity;
+                }
+            }
+            var redis = new redisHelper.Redis(enumclass.RedisCollection.UserIntents);
+            redis.SetItemToHash(IntentObject.AIagentData.familyID, IntentObject.name(), JSON.stringify(IntentJson), (err, res) => {
+                if (err) {
+                    console.log(err);
+                    redis.Quit();
+                }
+                else {
+                   //if ((res as number) > 5) {
+                   //    redis.DeleteLastItemFromList(IntentObject.AIagentData.familyID, (err, res) => { redis.Quit(); });
+                   //}
+                }
+            },60);
+        }
+
+        //读取 意图
         public ReadIntent(_AIagentData: AIagent.Agent.IAIAgentData, LUISIntentObject: LUISMainIntent, callback?: (Intent: IIntent) => void)
         {
-
-            var redis = new redisHelper.Redis(enumclass.RedisCollection.MicrosoftLUIS);
+            var redis = new redisHelper.Redis(enumclass.RedisCollection.UserIntents);
             redis.GetItemFromHash(_AIagentData.familyID, LUISIntentObject.name, (err, res) =>
             {
                 if (err) {
@@ -280,16 +315,7 @@ export module Intent {
                     }
                     else
                     {
-                        var IntentJosnObject: Object = JSON.parse(res);
-                        var Intent: IIntent = new this.IntentDict[LUISIntentObject.name]();
-                        Intent.AIagentData = _AIagentData;
-                        for (var key in Intent.entities)
-                        {
-                            if (IntentJosnObject.hasOwnProperty(key))
-                            {
-                                (Intent.entities[key] as IEntity.Entity.IEntity).entity = IntentJosnObject[key];
-                            }
-                        }
+                        Intent=this.IntentJosnStringToObject(LUISIntentObject.name, res, _AIagentData)
                         callback(Intent);
                     }
                     redis.Quit();
@@ -297,6 +323,20 @@ export module Intent {
 
             });
         } 
+
+        // IntentJosnString 数据库里意图的格式   stringToObject
+        public IntentJosnStringToObject(IntentName: string, IntentJosnString: string, _AIagentData: AIagent.Agent.IAIAgentData): IIntent
+        {
+            var IntentJosnObject: Object = JSON.parse(IntentJosnString);
+            var Intent: IIntent = new this.IntentDict[IntentName]();
+            Intent.AIagentData = _AIagentData;
+            for (var key in Intent.entities) {
+                if (IntentJosnObject.hasOwnProperty(key)) {
+                    (Intent.entities[key] as IEntity.Entity.IEntity).entity = IntentJosnObject[key];
+                }
+            }
+            return Intent;
+        }
     }
 }
 

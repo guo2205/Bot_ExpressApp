@@ -3,15 +3,19 @@
         /// <summary>
         /// 用户发的消息
         /// </summary>
-        message,
+        UserSendMessage=0,
         /// <summary>
-        /// 微软意图解析
+        /// 用户的意图
         /// </summary>
-        MicrosoftLUIS,
+        UserIntents,
+        /// <summary>
+        /// AI的意图
+        /// </summary>
+        AIIntents,
         /// <summary>
         /// 分析得出的结果
         /// </summary>
-        UserIntents,
+        UserGetMessage,
         /// <summary>
         /// 感知
         /// </summary>
