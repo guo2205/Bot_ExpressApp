@@ -1,5 +1,5 @@
 ﻿import IAction = require("../Action/IAction");
-
+import Iintent = require("../Intent/Iintent");
 
 //存在问题 Entity的 dictory直接写在 类里面 后面需要修改
 export namespace Entity
@@ -21,7 +21,7 @@ export namespace Entity
         dictory: Object;
 
         //一般实体的查询
-        query(queryString: string, args);
+        query(queryString: string, args: Iintent.Intent.LUISEntityData[]);
 
         //AI请求的实体的查询
         quest(queryString: string)
@@ -60,9 +60,10 @@ export namespace Entity
     export interface IlistEntity
     {
         //被选择的项 （12345）
+        ListItem: string[];
         choosedItem: number;
         choosedItemstr: string;
-        chooseListItem();
+        chooseListItem(queryString);
     }
 
     export interface IboolEntity {
@@ -87,7 +88,7 @@ export namespace Entity
         dictory: Object;
 
         //一般实体的查询
-        query(queryString: string, args)
+        query(queryString: string, args: Iintent.Intent.LUISEntityData[])
         {
             CommonQuery(this, queryString);
         }
@@ -112,20 +113,22 @@ export namespace Entity
         constructor() {
         };
 
+
 //========================================================================================================================
 //  list实体拓展方法
 //========================================================================================================================
+        ListItem: string[];
 
         choosedItem: number;
 
         choosedItemstr: string;
 
-        SetFucChooseListItem: () => void = null;
+        SetFucChooseListItem: (queryString: string) => void = null;
 
-        chooseListItem()
+        chooseListItem(queryString)
         {
-            if (null != this.chooseListItem) {
-                this.chooseListItem();
+            if (null != this.SetFucChooseListItem) {
+                this.SetFucChooseListItem(queryString);
             }
             else {
                 console.log(this.name + "is not extend function chooseListItem");
@@ -159,9 +162,10 @@ export namespace Entity
             city: Entity_City,
             Data: Entity_Data,
             goodtype: Entity_goodtype,
-            choosegood: Entity_choosegood,
+            ensure: Entity_ensure,
             list: Entity_list,
             good: Entity_good,
+            goodtag:Entity_goodtag,
         };
         var EntityObject: IEntity = new EntityConfig_[EntityName]();
         return EntityObject;
@@ -223,14 +227,119 @@ export namespace Entity
                 };
         }
     }
+    //家电类型
+    export class Entity_ApplianceType extends BaseEntity
+    {
+        name: string = "ApplianceType";
 
+        tag: number = 0;
+
+        constructor() {
+            super();
+            this.dictory =
+                {
+                    电视: "电视",
+                    空调: "空调",
+                };
+        }
+    }
+    //家电控制方式
+    export class Entity_ControlType extends BaseEntity
+    {
+        name: string = "ControlType";
+
+        tag: number = 0;
+
+        constructor() {
+            super();
+            this.dictory =
+                {
+                    打开: "开",
+                    关闭: "关",
+                };
+        }
+    }
+    //家电昵称
+    export class Entity_AppliancePetName extends BaseEntity
+    {
+        name: string = "AppliancePetName";
+
+        tag: number = 0;
+
+        constructor() {
+            super();
+            this.dictory =
+                {
+                    小电: "电视",
+                    小空: "空调",
+                };
+        }
+    }
+    //数值（0 1 2 3）
+    export class Entity_BuiltinNumber extends BaseEntity
+    {
+        name: string = "";
+
+        tag: number = 0;
+
+        //实体的具体
+        entity: string[] = [];
+
+        //一般实体的查询
+        query(queryString: string, args: Iintent.Intent.LUISEntityData[]) {
+            for (let num = 0; num < args.length; num++)
+            {
+                if (args[num].type == "builtin.number")
+                    this.entity.push(args[num].entity);
+            }
+        }
+    }
+    //家庭区域
+    export class Entity_Location extends BaseEntity
+    {
+        name: string = "Location";
+
+        tag: number = 0;
+
+        constructor() {
+            super();
+            this.dictory =
+                {
+                    客厅: "客厅",
+                    卧室: "卧室",
+                };
+        }
+    }
+
+    //商品标签 便宜 换一批等
+
+    export class Entity_goodtag extends BaseEntity {
+        name: string = "goodtag";
+
+        tag: number = 0;
+
+        constructor() {
+            super();
+            this.dictory =
+                {
+                    便宜: "便宜",
+                    有点贵: "便宜",
+                    太贵: "便宜",
+                    换: "换",
+                };
+        }
+    }
     //========================================================================================================================
     //  Entitys 类bool实体
     //========================================================================================================================
-    export class Entity_choosegood extends BaseEntity {
-        name: string = "choosegood";
+    export class Entity_ensure extends BaseEntity {
+        name: string = "_ensure";
 
         tag: number = 1;
+
+        query(queryString, args) {
+            console.log("Entity__ensure query function");
+        }
 
         constructor() {
             super();
@@ -255,11 +364,62 @@ export namespace Entity
 
         name: string = "list";
 
-        tag: number = 1;
+        tag: number = 0;
 
         query(queryString, args) {
             console.log("Entity_list query function");
         }
+
+        quest(queryString: string) {
+            CommonQueryOnlyOne(this, queryString);
+            if (this.entity.length > 0) {
+                try {
+                    this.choosedItem = parseInt(this.entity[0]);
+                    this.choosedItemstr = this.ListItem[this.choosedItem];
+                }
+                catch (e)
+                {
+                    for (var key in this.ListItem) {
+                        if (this.ListItem[key].indexOf(queryString) >= 0) {
+                            this.entity = [key];
+                            this.choosedItem = parseInt(key);
+                            this.choosedItemstr = this.ListItem[this.choosedItem];
+                            break;
+                        }
+                    }  
+                }
+            }
+            else
+            {
+                console.log(0);
+                for (var key in this.ListItem) {
+                    if (this.ListItem[key].indexOf(queryString) >= 0) {
+                        this.entity = [key];
+                        this.choosedItem = parseInt(key);
+                        this.choosedItemstr = this.ListItem[this.choosedItem];
+                        break;
+                    }
+                }  
+            } 
+        }
+
+        ListItem: string[]=[];
+
+        choosedItem: number=-1;
+
+        choosedItemstr: string="";
+
+        SetFucChooseListItem: (queryString: string) => void = (queryString: string) => {
+            console.log(0);
+            for (var key in this.ListItem) {
+                if (this.ListItem[key].indexOf(queryString) >= 0) {
+                    this.entity = [key];
+                    this.choosedItem = parseInt(key);
+                    this.choosedItemstr = this.ListItem[this.choosedItem];
+                    break;
+                }
+            }  
+        };
          
         constructor() {
             super();
@@ -277,7 +437,6 @@ export namespace Entity
         }
     }
 
-
     //========================================================================================================================
     //  Entitys 被动实体无法用户主动说明
     //========================================================================================================================
@@ -288,18 +447,9 @@ export namespace Entity
 
         tag: number = 0;
 
-        execute(actionReq: IAction.Action.IActionReq, callback: (ActionRes: IAction.Action.IActionRes) => void) {
-            var result: IAction.Action.IActionRes = { "res": false };
-            if (this.entity.length > 0) {
-                result.res = true;
-            }
-            callback(result);
-        }
-
         constructor() {
             super();
         }
     }
-
 }
 

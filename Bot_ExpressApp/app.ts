@@ -47,7 +47,8 @@ app.get('/home', (req, res) => { var x = req.query.qq; res.send("qq" + x); });
 app.get('/api/messages', (req, res) => { res.send("GET api/messages") });
 app.get('/api/sendtextmessage', routes.SendTextMessage);
 app.get('/api/getmessage', routes.GetMessage);
-app.post('/upload', )
+app.post('/api/sendtextmessage', routes.SendTextMessage_post);
+app.post('/api/getmessage', routes.GetMessage_post);
 
 
 //=========================================================

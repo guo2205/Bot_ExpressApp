@@ -11,7 +11,7 @@ export module Intent {
     {
         
         Intent: string;
-        entity: string;
+        entity: string[];
     }
  
     export interface IIntent {
@@ -287,7 +287,7 @@ export module Intent {
                    //    redis.DeleteLastItemFromList(IntentObject.AIagentData.familyID, (err, res) => { redis.Quit(); });
                    //}
                 }
-            },60);
+            },600);
         }
 
         //读取 意图

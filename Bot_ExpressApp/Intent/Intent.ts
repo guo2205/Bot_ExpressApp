@@ -57,14 +57,15 @@ export class Intent_Shopping implements Iintent.Intent.IIntent {
         return "Shopping";
     }
 
-    public entities: Object = { goodtype: new Entity.Entity.Entity_goodtype(), choosegood: new Entity.Entity.Entity_choosegood(), list: new Entity.Entity.Entity_list(), good: new Entity.Entity.Entity_good() };
+    public entities: Object = { goodtype: new Entity.Entity.Entity_goodtype(), ensure: new Entity.Entity.Entity_ensure(), list: new Entity.Entity.Entity_list(), good: new Entity.Entity.Entity_good(), goodtag: new Entity.Entity.Entity_goodtag() };
 
     public actions: Object = { RecommendGood: new Action.Action.action_RecommendGood(),OrderGood:new Action.Action.action_OrderGood()};
 
     public execute: Object = {
         "enter": "list",
         "list": ["OrderGood", "goodtype"],
-        "goodtype": ["RecommendGood", 10003],
+        "goodtype": ["goodtag", 10003],
+        "goodtag": ["RecommendGood", "RecommendGood"],
         "RecommendGood": [10033, 10043],
         "OrderGood": [10013,10053],
     };
@@ -74,4 +75,25 @@ export class Intent_Shopping implements Iintent.Intent.IIntent {
     constructor() {
 
     }
+}
+
+export class Intent_ControlAppliance implements Iintent.Intent.IIntent
+{
+    public name(): string
+    {
+        return "ControlAppliance";
+    }
+
+    public entities: Object = { AppliancePetName: new Entity.Entity.Entity_AppliancePetName(), ApplianceType: new Entity.Entity.Entity_ApplianceType(), ControlType: new Entity.Entity.Entity_ControlType(), Location: new Entity.Entity.Entity_BuiltinNumber() };
+
+    public actions: Object = { ControlAppliance: new Action.Action.action_ControlAppiance() };
+
+    public execute: Object =
+    {
+        
+    }
+
+    public AIagentData: AIagent.Agent.IAIAgentData;
+
+    constructor() { };
 }

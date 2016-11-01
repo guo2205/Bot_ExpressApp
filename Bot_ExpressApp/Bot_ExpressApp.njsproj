@@ -83,6 +83,7 @@ MICROSOFT_APP_ID=11f5e522-a973-4113-bef6-090da3c8425a</Environment>
     <Content Include="views\bot.html" />
     <Content Include="views\contact.jade" />
     <Content Include="views\about.jade" />
+    <Content Include="views\chat.html" />
     <Content Include="views\index.jade" />
     <Content Include="views\layout.jade" />
   </ItemGroup>

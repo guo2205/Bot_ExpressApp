@@ -172,24 +172,31 @@ export module Agent
                     console.log("ContextUnderstanding err :" + err);
                     redis.Quit();
                     return;
-
                 }
                 else {
                     var Intentstring: string = null;
-                    var entitystring: string = null;
+                    var entitystrings: string[] = null;
                     var entityObject: Entity.Entity.IEntity = null;
                     var IntentObject: Iintent.Intent.IIntent = null;
                     var AIIntent: Iintent.Intent.IAIIntent = null;
+                    var isUpdate: boolean = false;
                     for (var key in res) {
                         if (0 == key.indexOf("AI")) {
                             AIIntent=JSON.parse(res[key]) as Iintent.Intent.IAIIntent;
-                            entitystring = AIIntent.entity;
-                            entityObject = Entity.Entity.CreatEntityObject(entitystring);
-                            entityObject.quest(text);
-                            if (entityObject.entity.length > 0) {
-                                //IntentObject = new this.AIntentConfig[AIIntent.Intent]();
-                                IntentObject = this.intentMgr.IntentJosnStringToObject(AIIntent.Intent, res[AIIntent.Intent], this.AIAgentData);    
-                                IntentObject.entities[AIIntent.entity] = entityObject;
+                            entitystrings = AIIntent.entity;
+                            for (var index in entitystrings)
+                            {
+                                entityObject = Entity.Entity.CreatEntityObject(entitystrings[index]);
+                                entityObject.quest(text);
+                                if (entityObject.entity.length > 0) {
+                                    //IntentObject = new this.AIntentConfig[AIIntent.Intent]();
+                                    IntentObject = this.intentMgr.IntentJosnStringToObject(AIIntent.Intent, res[AIIntent.Intent], this.AIAgentData);
+                                    IntentObject.entities[AIIntent.entity[index]] = entityObject;
+                                    isUpdate = true;                         
+                                }
+                            }
+                            if (isUpdate)
+                            {
                                 this.intentMgr.ExecuteIntent(IntentObject, (SpeechCode: number, SpeechPa: Object) => { this.OnIntentCompleted(SpeechCode, SpeechPa); });
                                 redis.Quit();
                                 return;

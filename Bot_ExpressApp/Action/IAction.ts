@@ -67,44 +67,72 @@ export namespace Action
         }
     }
 
-
-     export class action_RecommendGood implements IAction {
-         execute(actionReq: IActionReq, callback: (ActionRes: IActionRes) => void) {
-             if (actionReq.entity["goodtype"].entity[0] == "牛奶") {
-                 var res: Object = {
-                     "res": true,
-                     "good0": "光明牛奶 38元一箱6盒",
-                     "good1": "蒙牛牛奶 48元一箱12袋",
-                     "good2": "伊利牛奶 58元一箱12瓶",
-                 };
-             }
-             else if (actionReq.entity["goodtype"].entity[0] == "鸡蛋") {
-                 var res: Object = {
-                     "res": true,
-                     "good0": "德青源鲜鸡蛋16枚，24.9元",
-                     "good1": "密园小农的柴鸡蛋20枚 49元",
-                     "good2": "京东上的密园小农的柴鸡蛋10枚 19.9元",
-                 };
-             }
-             else {
-                 var res: Object = {
-                     "res": false,
-                     goodtype: actionReq.entity["goodtype"].entity[0],
-                 };
-                 callback(res as IActionRes);
-                 return
-             }
-             actionReq.entity["good"].entity[0] = res["good0"];
-             actionReq.entity["good"].entity[1] = res["good1"];
-             actionReq.entity["good"].entity[2] = res["good2"];
+    export class action_RecommendGood implements IAction {
+        execute(actionReq: IActionReq, callback: (ActionRes: IActionRes) => void) {
+            if (actionReq.entity["goodtag"].entity[0] == "便宜") {
+                if (actionReq.entity["goodtype"].entity[0] == "牛奶") {
+                    var res: Object = {
+                        "res": true,
+                        "good0": "光明特价牛奶 33元一箱6盒",
+                        "good1": "蒙牛优惠牛奶 40元一箱12袋",
+                        "good2": "伊利特价牛奶 50元一箱12瓶",
+                    };
+                }
+                else if (actionReq.entity["goodtype"].entity[0] == "鸡蛋") {
+                    var res: Object = {
+                        "res": true,
+                        "good0": "德青源鲜鸡蛋8枚，12.9元",
+                        "good1": "密园小农的柴鸡蛋10枚 29元",
+                        "good2": "京东上的密园小农的柴鸡蛋5枚 9.9元",
+                    };
+                }
+                else {
+                    var res: Object = {
+                        "res": false,
+                        goodtype: actionReq.entity["goodtype"].entity[0],
+                    };
+                    callback(res as IActionRes);
+                    return
+                }
+            }
+            else
+            {
+                if (actionReq.entity["goodtype"].entity[0] == "牛奶") {
+                    var res: Object = {
+                        "res": true,
+                        "good0": "光明牛奶 38元一箱6盒",
+                        "good1": "蒙牛牛奶 48元一箱12袋",
+                        "good2": "伊利牛奶 58元一箱12瓶",
+                    };
+                }
+                else if (actionReq.entity["goodtype"].entity[0] == "鸡蛋") {
+                    var res: Object = {
+                        "res": true,
+                        "good0": "德青源鲜鸡蛋16枚，24.9元",
+                        "good1": "密园小农的柴鸡蛋20枚 49元",
+                        "good2": "京东上的密园小农的柴鸡蛋10枚 19.9元",
+                    };
+                }
+                else {
+                    var res: Object = {
+                        "res": false,
+                        goodtype: actionReq.entity["goodtype"].entity[0],
+                    };
+                    callback(res as IActionRes);
+                    return
+                }
+            }
+             (actionReq.entity["good"] as Entity.Entity.IEntity).entity[0]=res["good0"];
+             (actionReq.entity["good"] as Entity.Entity.IEntity).entity[1]=res["good1"];
+             (actionReq.entity["good"] as Entity.Entity.IEntity).entity[2]=res["good2"];
              callback(res as IActionRes);
              return;
          }
      }
 
-     export class action_OrderGood implements IAction {
+    export class action_OrderGood implements IAction {
          execute(actionReq: IActionReq, callback: (ActionRes: IActionRes) => void) {
-             if (actionReq.entity["goodtype"].entity[0] == "换") {
+             if (actionReq.entity["list"].entity[0] == "换") {
                  var res: Object = {
                      "res": false,
                  };
@@ -113,7 +141,7 @@ export namespace Action
              {
                  var res: Object = {
                      "res": true,
-                     good: actionReq.entity["good"].entity[parseInt(actionReq.entity["list"].entity[0]) - 1],
+                     good: (actionReq.entity["good"] as Entity.Entity.IEntity).entity[parseInt((actionReq.entity["list"] as Entity.Entity.IEntity).entity[0])-1],
                  };
                  actionReq.entity["good"].entity = [];
                  actionReq.entity["goodtype"].entity = [];
@@ -124,6 +152,13 @@ export namespace Action
          }
      }
 
+     export class action_ControlAppiance implements IAction
+     {
+         execute(actionReq: IActionReq, callback: (ActionRes: IActionRes) => void)
+         {
+            
+         };
+     }
 //========================================================================================================================
 //  IAction
 //========================================================================================================================

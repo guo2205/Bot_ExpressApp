@@ -1,19 +1,12 @@
-﻿ /*
- * GET home page.
- */
-///<reference path="../Data.ts" />
-import express = require('express');
-import * as Data from "../Data";
-import AIAgant = require('../AI/AIAgant');
-import mysql = require('mysql');
-import * as db from "../conf/db";
-import * as dao from "../dao/UtilsDao";
-
-export function index(req: express.Request, res: express.Response) {
+"use strict";
+var Data = require("../Data");
+var AIAgant = require('../AI/AIAgant');
+function index(req, res) {
     res.render("chat.html");
-};
-
-export function SendTextMessage_post(req, res) {
+}
+exports.index = index;
+;
+function SendTextMessage_post(req, res) {
     if (Data.Data.CheckPa(req.body.status, req.body.deviceCDK, req.body.text)) {
         res.send("10001");
         return;
@@ -21,7 +14,6 @@ export function SendTextMessage_post(req, res) {
     console.log("req.body.status" + req.body.status);
     console.log("req.body.deviceCDK" + req.body.deviceCDK);
     console.log("req.body.text" + req.body.text);
-
     //CheckCDK(req.query.cdk, (obj: db.result) =>
     //{
     //    let json: Object = JSON.parse(obj.info);
@@ -30,10 +22,10 @@ export function SendTextMessage_post(req, res) {
     //});
     switch (req.body.status) {
         case "1":
-            Data.Data.deviceCDKToFamilyId(req.body.deviceCDK, function (familyID: number) {
+            Data.Data.deviceCDKToFamilyId(req.body.deviceCDK, function (familyID) {
                 if (familyID > 0) {
                     var AI = new AIAgant.Agent.AIAgent(req.body.deviceCDK, familyID);
-                    AI.GetTextTouch(req.body.text)
+                    AI.GetTextTouch(req.body.text);
                     res.send("10000");
                 }
                 else
@@ -45,9 +37,8 @@ export function SendTextMessage_post(req, res) {
             break;
     }
 }
-
-
-export function SendTextMessage(req, res) {
+exports.SendTextMessage_post = SendTextMessage_post;
+function SendTextMessage(req, res) {
     if (Data.Data.CheckPa(req.query.status, req.query.deviceCDK, req.query.text)) {
         res.send("10001");
         return;
@@ -60,10 +51,10 @@ export function SendTextMessage(req, res) {
     //});
     switch (req.query.status) {
         case "1":
-            Data.Data.deviceCDKToFamilyId(req.query.deviceCDK, function (familyID: number) {
+            Data.Data.deviceCDKToFamilyId(req.query.deviceCDK, function (familyID) {
                 if (familyID > 0) {
                     var AI = new AIAgant.Agent.AIAgent(req.query.deviceCDK, familyID);
-                    AI.GetTextTouch(req.query.text)
+                    AI.GetTextTouch(req.query.text);
                     res.send("10000");
                 }
                 else
@@ -75,34 +66,36 @@ export function SendTextMessage(req, res) {
             break;
     }
 }
-
-export function GetMessage(req: express.Request, res: express.Response)
-{
-    var deviceCDK: string = req.query['deviceCDK'];
+exports.SendTextMessage = SendTextMessage;
+function GetMessage(req, res) {
+    var deviceCDK = req.query['deviceCDK'];
     Data.GetUnifiedJson(deviceCDK, function (resJson) {
         res.send(JSON.stringify(resJson));
     });
 }
-
-export function GetMessage_post(req: express.Request, res: express.Response) {
-    var deviceCDK: string = req.body.deviceCDK;
+exports.GetMessage = GetMessage;
+function GetMessage_post(req, res) {
+    var deviceCDK = req.body.deviceCDK;
     Data.GetUnifiedJson(deviceCDK, function (resJson) {
         res.send(JSON.stringify(resJson));
     });
 }
-
-export function about(req: express.Request, res: express.Response) {
+exports.GetMessage_post = GetMessage_post;
+function about(req, res) {
     res.render('about', { title: 'About', year: new Date().getFullYear(), message: 'Your application description page' });
-};
-
-export function contact(req: express.Request, res: express.Response) {
+}
+exports.about = about;
+;
+function contact(req, res) {
     res.render('contact', { title: 'Contact', year: new Date().getFullYear(), message: 'Your contact page' });
-};
-
-export function bot(req: express.Request, res: express.Response) {
+}
+exports.contact = contact;
+;
+function bot(req, res) {
     res.render('bot.html');
-};
-
+}
+exports.bot = bot;
+;
 /*
 var bady = {
             "messages": [
@@ -115,3 +108,4 @@ var bady = {
             ]
         }
 */
+//# sourceMappingURL=index.js.map
